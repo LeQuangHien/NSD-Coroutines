@@ -74,7 +74,7 @@ fun DiscoveryScreen(viewModel: DiscoveryViewModel) {
         ) {
             Button(
                 onClick = {
-                    viewModel.discoverService("_http._tcp.", "Secure")
+                    viewModel.discoverService()
                 }
             ) {
                 Text("Start Discover")
