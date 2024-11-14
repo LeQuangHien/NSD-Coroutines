@@ -13,6 +13,7 @@ import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -39,7 +40,7 @@ class NsdHelper(context: Context) {
     suspend fun discoverServices(
         serviceType: String,
         serviceName: String
-    ): ReceiveChannel<NsdServiceInfo> {
+    ): ReceiveChannel<NsdServiceInfo> = withContext(Dispatchers.IO) {
         discoveryListener = object : NsdManager.DiscoveryListener {
             override fun onDiscoveryStarted(serviceType: String) {
                 Log.d(TAG, "Service discovery started for type: $serviceType")
@@ -81,7 +82,7 @@ class NsdHelper(context: Context) {
         multicastLock.acquire()
 
         nsdManager.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, discoveryListener)
-        return serverChannel
+        serverChannel
     }
 
     // Helper suspend function to resolve a service
@@ -148,7 +149,7 @@ class NsdHelper(context: Context) {
         }
 
     // Stop discovery
-    fun stopDiscovery() {
+    suspend fun stopDiscovery() = withContext(Dispatchers.IO) {
         discoveryListener?.let {
             nsdManager.stopServiceDiscovery(it)
             discoveryListener = null

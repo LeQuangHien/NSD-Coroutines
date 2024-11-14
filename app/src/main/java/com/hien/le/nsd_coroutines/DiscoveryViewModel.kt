@@ -58,8 +58,12 @@ class DiscoveryViewModel(private val nsdHelper: NsdHelper) : ViewModel() {
 
     fun stopDiscovery() {
         viewModelScope.launch {
-            nsdHelper.stopDiscovery()
-            _discoveryState.update { DiscoveryState.Stop }
+            try {
+                nsdHelper.stopDiscovery()
+                _discoveryState.update { DiscoveryState.Stop }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to stop service discovery: ${e.message}")
+            }
         }
     }
 }
